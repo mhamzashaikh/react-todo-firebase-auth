@@ -1,0 +1,15 @@
+.form-container{
+  
+    width: auto;
+    height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
+    row-gap: 10px;
+}
+
+.form-container span{
+    font-size: 12px;
+
+}

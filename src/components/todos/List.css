@@ -1,0 +1,38 @@
+
+.updateIcon{
+   
+   margin-top: 3px;
+   padding: 1px 4px;
+   color: #724615;
+
+}
+
+.myList{
+   box-sizing: border-box;
+   width: 550px;
+}
+
+
+li{
+   list-style: none;
+}
+
+.myIcons{
+   display: inline-flex;
+   align-items: center;
+
+}
+
+.input-enable{
+   border: none;
+}
+
+.input-enable:focus{
+   outline: blue solid 2px;
+}
+
+.input-disable{
+   outline: none;
+   background: #FDEEDC;
+   color: #E38B29;
+}
