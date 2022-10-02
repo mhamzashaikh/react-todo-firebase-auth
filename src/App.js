@@ -21,6 +21,8 @@ function App() {
   }
   );
 
+
+
   function signin(newUser, callback) {
     console.log("CALLED FROM Login Page");
     return fakeAuthProvider.signin(() => {
@@ -42,7 +44,7 @@ function App() {
 
   let value = { user, signin, signout };
 
-  console.log("user is:", user);
+  console.log("app page value", value);
 
 
 
@@ -53,15 +55,15 @@ function App() {
 
 
         <Routes>
-          <Route path="/" element={
+          <Route exact path="/" element={
             <ProtectedWrapper name="hello">
               <Home />
             </ProtectedWrapper>
           } />
 
-          <Route path='/*' element={<h1>404 page</h1>} />
           <Route path="/login" element={<Login />} />
           <Route path="/signup" element={<Signup />} />
+          <Route path='*' element={<h1>404 page</h1>} />
 
           <Route path="/todolist" element={
             <ProtectedWrapper name="hello">
