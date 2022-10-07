@@ -1,24 +1,40 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useContext } from 'react';
 import './List.css';
 import './TodoList.css';
+import AuthContext from "../../AuthContext";
+import { ref, update, onValue, query, orderByKey, remove } from "firebase/database";
+import database from "../../firebaseConfig";
 
 
 function List() {
-    const localStorageTodo = JSON.parse(localStorage.getItem("TodoList"));
 
-    const [todolist, setTodoList] = useState(localStorageTodo !== null ? localStorageTodo : []);
+
+    const [todolist, setTodoList] = useState([]);
     const [editTodoIndex, setEditTodoIndex] = useState(null); // storing index value
-
-
-
-
+    
+    const auth = useContext(AuthContext);
+    // Firebase 
+    const checkRef = ref(database, 'todos/' + auth.user.uid);
+    const myQuery = query(checkRef, orderByKey());
+    
+    
     useEffect(() => {
-        const myNewList = [...todolist];
-        localStorage.setItem('TodoList', JSON.stringify(myNewList))
-
-    }, [todolist]);
-
-
+        onValue(myQuery, (snapshot) => {
+            let myarr = [];
+            myarr = snapshot.val();
+            console.log("inside arr", myarr);
+            if (myarr !== null){
+                console.log("Object entries", Object.entries(myarr));
+                let myArrayData = Object.entries(myarr);
+                setTodoList(myArrayData);
+            
+            }
+                else{
+                    setTodoList([]);
+                }
+        });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    },[]);
 
 
 
@@ -34,27 +50,28 @@ function List() {
     // for Update button
 
     const onUpdate = (index, changeValue) => {
-        const newList = [...todolist];
-        newList[index] = changeValue;
 
-        setTodoList(newList);
+        let todoKey = todolist[index][0];
+        const updates = {};
+        console.log("update: and key", index ,changeValue );
+        updates[`/todos/${auth.user.uid}/${todoKey}`] = changeValue;
+        return update(ref(database), updates);
 
-    }
-
-    // For Delete Button
-    const deleteItem = (id) => {
-
-        // deleting only that value which was clicked, Condition : add only that values in setValue state whose indexNum not equal to id & those(indexNum and id) is matched will be deleted or remove from our TodoList.
-
-        setTodoList((oldArrItems) => {
-            return oldArrItems.filter((arrElement, indexNum) => {
-                return indexNum !== id;
-            })
-
-        })
+        
 
     }
 
+
+    // For delete 
+
+    const deleteItems = (indexid) => {
+
+        console.log(indexid);
+        let todoKey = todolist[indexid][0];
+        const checkRef = ref(database, `/todos/${auth.user.uid}/${todoKey}`);
+        remove(checkRef);
+
+    }
 
 
 
@@ -73,18 +90,20 @@ function List() {
                             {todolist.map((element, index) => {
 
                                 return (
+      
+                                    
                                     <li key={index}>
                                         {
                                             editTodoIndex === index ?
                                                 (<input className='input-enable'
-                                                    value={element}
+                                                    value={element[1]}
                                                     onChange={(e) => {
                                                         onUpdate(index, e.target.value);
                                                     }}
                                                 />
                                                 )
                                                 : (
-                                                    <input className='input-disable' value={element} readOnly />
+                                                    <input className='input-disable' value={element[1]} readOnly />
                                                 )
                                         }
 
@@ -105,7 +124,7 @@ function List() {
                                             </button>
 
                                             {/* Deleting ion */}
-                                            <button className="myButtons deleteIcon" onClick={() => { deleteItem(index) }}>
+                                            <button className="myButtons deleteIcon" onClick={() => { deleteItems(index) }}>
                                                 delete
                                             </button>
                                         </div>

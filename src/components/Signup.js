@@ -1,47 +1,41 @@
 import "./Form.css";
+import { ToastContainer, toast } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 import { Link, useNavigate } from 'react-router-dom';
 import { useState } from "react";
-import app from '../firebaseConfig';
 import { getAuth, createUserWithEmailAndPassword } from "firebase/auth";
 
 function Signup() {
 
     const navigate = useNavigate();
     const [userData, setUserInput] = useState({});
-
+    const [errors, setErrors] =  useState();
     const {email, password} = userData; // destructuring
-
-    console.log("email: ", email);
-    console.log("pass: ", password);
-
-
-
-
+    const notifySuccess = () => toast.success("Succesfully signup ", { position: toast.POSITION.TOP_CENTER });
+    const notifyFail = () => toast.warning("Something went wrong", { position: toast.POSITION.TOP_CENTER });
 
     // Firebase Signup email 
 
-    const signupUser = async () => {
+    const signupUser = () => {
 
-
-
-        const auth = getAuth(app);
-        await createUserWithEmailAndPassword(auth, email, password)
+        const auth = getAuth();
+        createUserWithEmailAndPassword(auth, email, password)
             .then((userCredential) => {
                 // Signed in 
-                const user = userCredential.user;
-                // localStorage.setItem('Auth Token', userCredential._tokenResponse.refreshToken);
+                // const user = userCredential.user;
+                notifySuccess();
                 navigate("/login");
                 // ...
             })
             .catch((error) => {
-                const errorCode = error.code;
                 const errorMessage = error.message;
+                setErrors(errorMessage);
+                notifyFail();
                 // ..
             });
-            alert("submit");
+       
 
     }
-
 
 
 
@@ -51,16 +45,6 @@ function Signup() {
 
 
 
-    function submit() {
-        // localStorage.setItem("userData", JSON.stringify(userData));
-
-        localStorage.setItem("user", JSON.stringify(userData));
-
-
-        alert("submit");
-
-        navigate("/login");
-    }
 
     return (
         <div className="form-container">
@@ -68,10 +52,12 @@ function Signup() {
             <label htmlFor="signupEmail">Email: </label>
             <input type="email" id="signupEmail" onChange={(e) => { updateField("email", e.target.value) }} />
             <label htmlFor="signupPassword">Password: </label>
-            <input type="password" id="signupPassword" onChange={(e) => { updateField("password", e.target.value) }} />
+            <input type="password" id="signupPassword"  onChange={(e) => { updateField("password", e.target.value) }} />
             <span>Already Registered? <Link to="/login">Login now</Link></span>
+            {errors}
 
             <button id="signupBtn" onClick={signupUser}>Signup</button>
+            <ToastContainer />
 
         </div>
     )

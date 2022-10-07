@@ -5,18 +5,16 @@ import Input from './Input';
 
 
 function TodoList() {
-    const checkLocalStorageData = JSON.parse(localStorage.getItem('myTodoData'));
-
-    const [value, setValue] = useState(checkLocalStorageData!==null? checkLocalStorageData: []);
+    const [value, setValue] = useState(checkLocalStorageData !== null ? checkLocalStorageData : []);
     const [text, setText] = useState("");
     const [editTodoIndex, setEditTodoIndex] = useState(null); // storing index value
 
-    
-    useEffect(()=>{
-        const myNewList = [...value];
-        localStorage.setItem('myTodoData',JSON.stringify(myNewList))
 
-    },[value]);
+    useEffect(() => {
+        const myNewList = [...value];
+        localStorage.setItem('myTodoData', JSON.stringify(myNewList))
+
+    }, [value]);
 
 
     // For Storing input Text in setText
@@ -29,7 +27,7 @@ function TodoList() {
     const updateList = () => {
 
         setValue([...value, text]);
-    
+
         setText("");
     }
 

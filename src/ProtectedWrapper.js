@@ -9,7 +9,7 @@ function ProtectedWrapper(props){
     console.log('====================================');
 
     if(!auth.user){
-        return <Navigate to="./login" replace />
+        return <Navigate to="/login" replace />
 
     }
 

@@ -4,16 +4,14 @@ import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import { getAuth, signInWithEmailAndPassword } from "firebase/auth";
 import "./Form.css";
-import app from "../firebaseConfig";
 import AuthContext from "../AuthContext";
 
 
 function Login() {
     const [loginUserData, setUserData] = useState({});
     const { email, password } = loginUserData; // destructuring
-
+    const [errors, setErrors] =  useState();
     const authcontext = useContext(AuthContext);
-
     const navigate = useNavigate();
 
     const notifySuccess = () => toast.success("Succesfully login", { position: toast.POSITION.TOP_CENTER });
@@ -23,30 +21,22 @@ function Login() {
     // ==================== Firebase login =======================================
 
     const signinUser = async () => {
-        const auth = getAuth(app);
+        const auth = getAuth();
         await signInWithEmailAndPassword(auth, email, password)
             .then((userCredential) => {
                 // Signed in 
                 const user = userCredential.user;
-                // console.log("userCredential: ",userCredential);
-                // console.log("user: ",user);
+                console.log("userCredential: ", userCredential);
+                console.log("user: ", user);
 
                 // --------- context auth -------- 
 
                 authcontext.signin(
-                    {
-                        email: email,
-                        password: password,
-                    },
+                    user,
                     () => {
-                        localStorage.setItem("loginUserToken", userCredential._tokenResponse.refreshToken);
                         notifySuccess();
                         navigate('/');
-
-                    }
-                );
-
-                alert("Login details correct");
+                    });
 
                 // -----------------------------------------
 
@@ -55,12 +45,10 @@ function Login() {
             })
             .catch((error) => {
                 // const errorCode = error.code;
-                // const errorMessage = error.message;
+                const errorMessage = error.message;
+                setErrors(errorMessage);
                 notifyFail();
             });
-
-
-
 
     }
 
@@ -71,10 +59,11 @@ function Login() {
         <div className="form-container">
 
             <label htmlFor="loginEmail">Email</label>
-            <input type="text" id="loginEmail" onChange={(e) => setUserData({ ...loginUserData, "email": e.target.value })} />
+            <input type="email" id="loginEmail" onChange={(e) => setUserData({ ...loginUserData, "email": e.target.value })} />
             <label htmlFor="loginPassword">Password</label>
-            <input type="text" id="loginPassword" onChange={(e) => setUserData({ ...loginUserData, "password": e.target.value })} />
+            <input type="password" id="loginPassword" onChange={(e) => setUserData({ ...loginUserData, "password": e.target.value })} />
             <span>Don't have an account? <Link to="/signup">Create account now</Link></span>
+            {errors}
 
             <button id="loginBtn" onClick={signinUser}>Login</button>
             <ToastContainer />
